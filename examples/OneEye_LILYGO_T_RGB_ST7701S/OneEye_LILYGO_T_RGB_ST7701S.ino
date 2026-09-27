@@ -169,18 +169,19 @@ void loop() {
     //  Serial.println(eyes.errorString());
     //}
 
-    if (!eyes.prepareEye(demo_mode_config_filepath)) {
-      Serial.print("  failed: ");
-      Serial.println(eyes.errorString());
+    if (eyes.prepareEye(demo_mode_config_filepath)) {
+      #if EYELIDS_SYMMETRIC == 1
+        // setters can be called in between prepareEye() and applyEye()
+        eyes.setUpperEyelid("/00/upper-symmetrical.bmp");
+        eyes.setLowerEyelid("/00/lower-symmetrical.bmp");
+      #endif
+
+      if (!eyes.applyEye(demo_mode_config_filepath)) {
+        Serial.print("  failed: ");
+        Serial.println(eyes.errorString());
+      }
     }
-
-    #if EYELIDS_SYMMETRIC == 1
-      // setters can be called in between prepareEye() and applyEye()
-      eyes.setUpperEyelid("/00/upper-symmetrical.bmp");
-      eyes.setLowerEyelid("/00/lower-symmetrical.bmp");
-    #endif
-
-    if (!eyes.applyEye(demo_mode_config_filepath)) {
+    else {
       Serial.print("  failed: ");
       Serial.println(eyes.errorString());
     }
