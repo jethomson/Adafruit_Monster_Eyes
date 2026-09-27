@@ -162,17 +162,29 @@ void loop() {
 
     randomEyes();
 
-    // this will not work because there are not separate calls for loading a config
-    // and creating the eye that these calls can go between.
-    //#if EYELIDS_SYMMETRIC == 1
-    //  eyes.setUpperEyelid("/00/upper-symmetrical.bmp");
-    //  eyes.setLowerEyelid("/00/lower-symmetrical.bmp");
-    //#endif
+    // this will load the configuration and create the eye in one
+    // go with no opportunity to call setters to tweak the configuration
+    //if (!eyes.loadEye(demo_mode_config_filepath)) {
+    //  Serial.print("  failed: ");
+    //  Serial.println(eyes.errorString());
+    //}
 
-    if (!eyes.loadEye(demo_mode_config_filepath)) {
+    if (!eyes.prepareEye(demo_mode_config_filepath)) {
       Serial.print("  failed: ");
       Serial.println(eyes.errorString());
     }
+
+    #if EYELIDS_SYMMETRIC == 1
+      // setters can be called in between prepareEye() and applyEye()
+      eyes.setUpperEyelid("/00/upper-symmetrical.bmp");
+      eyes.setLowerEyelid("/00/lower-symmetrical.bmp");
+    #endif
+
+    if (!eyes.applyEye(demo_mode_config_filepath)) {
+      Serial.print("  failed: ");
+      Serial.println(eyes.errorString());
+    }
+
     start_time = esp_timer_get_time();
     digitalWrite(LCD_BK, HIGH);
     return;
