@@ -1,0 +1,24 @@
+# Name,   Type, SubType, Offset,  Size, Flags
+# usual location but will be overwritten when flashing merge_bin single file binary.
+#nvs,      data, nvs,    0x009000, 0x005000,
+# otadata is not needed, but is there any point in not having it?
+
+app0,     app,  ota_0,   0x010000, 0x88000,
+
+# about 4.02 MB.
+# do not use a partition smaller than this.
+# partitions smaller than 0x404000 will result in a number of FAT16 cluster below the minimum required.
+# this is good for testing/developing because you upload a new file system quicker.
+# about 16 seconds to erase, and 30 seconds to write.
+#user_fs, data,    fat,   0x098000, 0x404000,
+
+# 7 MB, fits all eyes.
+# about 30 seconds to erase, and 50 seconds to write.
+user_fs, data,    fat,   0x098000, 0x700000,
+
+# about 15.4 MB, pretty much the max possible.
+# about 60 seconds to erase, and 100 seconds to write.
+#user_fs, data,    fat,   0x098000, 0xF65000,
+
+# moving nvs to the end means WiFi credentials, etc. will not be overwritten when flashing merge_bin single file binary.
+nvs,      data, nvs,     0xFFD000, 0x3000,

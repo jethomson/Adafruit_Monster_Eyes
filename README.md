@@ -1,3 +1,6 @@
+jethomson: The motivation behind this fork is to (1) get development working in PlatformIO when the default fatfs created by PlatformIO is incompatible with this project, and (2) create an example ino file for the LILYGO T-RGB. generate_fatfs.py is a extra script that runs during Build Filesystem Image and Upload Filesystem Image, which creates a CircuitPython compatible fatfs. The example for the LILYGO T-RGB resides in examples/OneEye_LILYGO_T_RGB_ST7701S/OneEye_LILYGO_T_RGB_ST7701S.ino. No changes have been made to files in the src folder. 
+ I wouldn't recommend adding code that writes to the filesystem since CircuitPython does not use a fatfs with wear leveling.<br><br>
+
 # Adafruit Monster Eyes [![Build Status](https://github.com/adafruit/Adafruit_Monster_Eyes/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit_Monster_Eyes/actions)[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](http://adafruit.github.io/Adafruit_Monster_Eyes/html/index.html)
 
 Arduino library to show moving, blinking eyes on various displays. Ported from the [M4_Eyes for the MONSTER M4SK by Phil B. for Adafruit Industries](https://github.com/adafruit/Adafruit_Learning_System_Guides/tree/main/M4_Eyes)
