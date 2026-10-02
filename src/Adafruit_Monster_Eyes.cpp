@@ -104,6 +104,8 @@ void Adafruit_Monster_Eyes::applyDefaults(void) {
   _settings.scleraStartAngle = 512;
   _settings.eyelidMirror = true;
   _settings.fixate = 7;
+  _settings.autoBlink = true;
+  _settings.autoGaze = true;
 
   _swapBytes = false;
   _begun = false;
@@ -141,7 +143,6 @@ void Adafruit_Monster_Eyes::applyDefaults(void) {
   _irisRange = 1.0f;
 
   _gazeExternal = _pupilExternal = _blinkExternal = false;
-  _autoBlink = _autoGaze = true;
   _drawOffX = _drawOffY = 0;
   _blinkForced = 0.0f;
   _clockOffset = 0;
@@ -1191,6 +1192,7 @@ void Adafruit_Monster_Eyes::renderEye(uint8_t e) {
   const int mapRadius = _mapRadius, mapDiameter = _mapDiameter;
   const int offX = _drawOffX, offY = _drawOffY;
 
+uint32_t t0 = 0;
   for (int x = 0; x < size; x++) {
     // Destination pointer starts at the TOP of the column and walks up-screen
     // as y increases.
@@ -1238,7 +1240,6 @@ void Adafruit_Monster_Eyes::renderEye(uint8_t e) {
       _display->columnDone(e, x);
       continue;
     }
-
     // Lower eyelid
     int y = 0;
     for (; y < oy1; y++, dst += stride)
@@ -1355,9 +1356,9 @@ void Adafruit_Monster_Eyes::update(void) {
     return;
   _frameMicros = micros();
 
-  if (_autoGaze && !_gazeExternal)
+  if (_settings.autoGaze && !_gazeExternal)
     updateGaze(_frameMicros);
-  if (_autoBlink && !_blinkExternal)
+  if (_settings.autoBlink && !_blinkExternal)
     updateBlinks(_frameMicros);
   if (!_pupilExternal)
     updateIris();

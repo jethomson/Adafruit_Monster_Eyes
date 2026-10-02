@@ -2,7 +2,7 @@
   "eyeRadius": 125,
   "irisRadius": 75,
   "slitPupilRadius": 70,
-  "eyelidColor": "0x0b10",
+  "eyelidColor": "0x0a0b",
   "pupilColor": [
     0,
     0,

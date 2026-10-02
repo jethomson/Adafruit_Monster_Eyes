@@ -5,12 +5,31 @@
 #include "LILYGO_T_RGB_pins.h"
 #include "esp_random.h"
 
+// use CONFIG_FILENAME to show one type of eye
+// use DEMO_MODE_SECONDS to show an random eye for N seconds, then load another random eye, and so on.
+// CONFIG_FILENAME and DEMO_MODE_SECONDS are mutually exclusive
+// if CONFIG_FILENAME is set it will override DEMO_MODE_SECONDS
+//#define CONFIG_FILENAME "/pomni/config.eye"
+//#define CONFIG_FILENAME "/demon/config.eye"
+//#define CONFIG_FILENAME "/owl/config.eye"
+//#define CONFIG_FILENAME "/doom-spiral/config.eye"
+#define DEMO_MODE_SECONDS 120
+
+#if defined(CONFIG_FILENAME)
+#undef DEMO_MODE_SECONDS
+#endif
+
+#if !defined(CONFIG_FILENAME) && !defined(DEMO_MODE_SECONDS)
+#define DEMO_MODE_SECONDS 120
+#endif
 
 #define TRGB_W 480
 #define TRGB_H 480
 #define EYE_SCALE 2
 
+// 2.1 inch LILYGO T-RGB display
 #define TRGB_INIT_OPS st7701_type4_init_operations
+
 
 #define TRGB_HS_POL 1 ///< HSYNC polarity
 #define TRGB_HS_FP 50 ///< HSYNC front porch
@@ -21,6 +40,19 @@
 #define TRGB_VS_FP 20 ///< VSYNC front porch
 #define TRGB_VS_PW 1  ///< VSYNC pulse width
 #define TRGB_VS_BP 30 ///< VSYNC back porch
+
+
+/*
+#define TRGB_HS_POL 1 ///< HSYNC polarity
+#define TRGB_HS_FP 50 ///< HSYNC front porch
+#define TRGB_HS_PW 1  ///< HSYNC pulse width
+#define TRGB_HS_BP 10 ///< HSYNC back porch
+
+#define TRGB_VS_POL 1 ///< VSYNC polarity
+#define TRGB_VS_FP 20 ///< VSYNC front porch
+#define TRGB_VS_PW 1  ///< VSYNC pulse width
+#define TRGB_VS_BP 15 ///< VSYNC back porch
+*/
 
 #define TRGB_R0 21
 #define TRGB_R1 18
@@ -46,11 +78,11 @@
 char demo_mode_config_filepath[EYES_PATH_MAX];
 const uint64_t demo_mode_runtime = DEMO_MODE_SECONDS * 1000000ULL; // [seconds]
 // comment out a folder name if you do not want to see it in demo mode
-// spooky only
+// spooky ones I like only
 const char *demo_mode_eye_folders[] = {
     //"anime",
     //"big_blue",
-    "cat",
+    //"cat",
     "deer",
     "demon",
     //"doom-red",
@@ -69,7 +101,7 @@ const char *demo_mode_eye_folders[] = {
     "skull",
     "snake_green",
     "spikes",
-    "terminator",
+    //"terminator",
     //"toonstripe",
     "zombie"
 };
@@ -91,10 +123,13 @@ Arduino_ESP32RGBPanel rgbpanel(
       TRGB_HS_POL, TRGB_HS_FP, TRGB_HS_PW, TRGB_HS_BP,
       TRGB_VS_POL, TRGB_VS_FP, TRGB_VS_PW, TRGB_VS_BP,
       1,          // pclk_active_neg
-      18000000,   // prefer_speed
+      //12000000,   // prefer_speed, 12 MHz suggested in Arduino_GFX_dev_device.h from Arduino GFX library
+      //18000000,   // prefer_speed, 18 MHz max stable speed with empty bounce_buffer
+      22000000,   // prefer_speed, 22 MHz at 10*480, seems to be the best possible
       false,      // useBigEndian
       0,          // de_idle_high
       0,          // pclk_idle_high
+      //0      // bounce_buffer_size_px, default buffer is empty
       10*480      // bounce_buffer_size_px
 );
 
@@ -105,13 +140,15 @@ Arduino_RGB_Display gfx(
 
 Adafruit_Monster_Eyes eyes(&gfx, EYE_SCALE);
 
+#if DEMO_MODE_SECONDS > 0
 void randomEyes() {
-    size_t total_folders = sizeof(demo_mode_eye_folders) / sizeof(demo_mode_eye_folders[0]);
-    int random_index = esp_random() % total_folders;
+  size_t total_folders = sizeof(demo_mode_eye_folders) / sizeof(demo_mode_eye_folders[0]);
+  int random_index = esp_random() % total_folders;
 
-    // snprintf will copy up to EYES_PATH_MAX-1 and add '\0'
-    snprintf(demo_mode_config_filepath, sizeof(demo_mode_config_filepath), "/%s/config.eye", demo_mode_eye_folders[random_index]);
+  // snprintf will copy up to EYES_PATH_MAX-1 and add '\0'
+  snprintf(demo_mode_config_filepath, sizeof(demo_mode_config_filepath), "/%s/config.eye", demo_mode_eye_folders[random_index]);
 }
+#endif
 
 void setup() {
   pinMode(LCD_BK, OUTPUT);
@@ -136,7 +173,9 @@ void setup() {
     eyes.setConfigFile(CONFIG_FILENAME);
   #endif
 
+
   #if EYELIDS_SYMMETRIC == 1
+    // this does not actually seem to work since loadConfig() is called by begin()
     eyes.setUpperEyelid("/00/upper-symmetrical.bmp");
     eyes.setLowerEyelid("/00/lower-symmetrical.bmp");
   #endif
@@ -194,4 +233,11 @@ void loop() {
 
 
   eyes.animate();
+
+
+  static uint32_t last = 0;
+  if (millis() - last >= 1000) {
+    last = millis();
+    Serial.printf("%.2f fps\n", eyes.frameRate());
+  }
 }

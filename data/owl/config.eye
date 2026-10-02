@@ -4,9 +4,8 @@
   "slitPupilRadius": 0,
   "eyelidColor": "0x0001",
   "tracking": false,
-  "lookAround": false,
-  "blink": true,
-  "pupilColor": [
+  "autoGaze": false,
+    "pupilColor": [
     0,
     0,
     0

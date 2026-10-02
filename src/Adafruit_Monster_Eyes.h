@@ -88,6 +88,8 @@ struct EyesSettings {
   char scleraFile[EYES_PATH_MAX]; ///< Sclera texture path on the drive
   char upperFile[EYES_PATH_MAX];  ///< Upper eyelid bitmap path
   char lowerFile[EYES_PATH_MAX];  ///< Lower eyelid bitmap path
+  bool autoBlink;             ///< Blink enable/disable
+  bool autoGaze;              ///< Look around enable/disable
 };
 
 /**

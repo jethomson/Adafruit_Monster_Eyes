@@ -583,6 +583,14 @@ void Adafruit_Monster_Eyes::applyConfigRoot(const void *variantPtr) {
   copyStr(_settings.scleraFile, o["scleraTexture"]);
   copyStr(_settings.upperFile, o["upperEyelid"]);
   copyStr(_settings.lowerFile, o["lowerEyelid"]);
+
+  v = o["autoBlink"];
+  if (v.is<bool>())
+    _settings.autoBlink = v.as<bool>();
+
+  v = o["autoGaze"];
+  if (v.is<bool>())
+    _settings.autoGaze = v.as<bool>();
 }
 
 // Only the values that may legitimately differ between two eyes. Geometry and
